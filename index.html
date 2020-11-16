@@ -27,16 +27,16 @@
             const xlabels  = [];
             const ytemps =  [];
 async function chartIt() {
-    await getData();
+    const data = await getData();
     var ctx = document.getElementById('myChart').getContext('2d');
 
     const myChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: xlabels,
+            labels: data.xs,
             datasets: [{
-                label: 'Average Temperature',
-                data: ytemps,
+                label: 'Average Temperature in C°',
+                data: data.ys,
                 backgroundColor: 
                 'rgba(255, 99, 132, 0.2)'
                 ,
@@ -46,6 +46,18 @@ async function chartIt() {
                 borderWidth: 1
             }]
         },
+        options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    // Include a dollar sign in the ticks
+                    callback: function(value, index, values) {
+                        return value + '°';
+                    }
+                }
+            }]
+        }
+    }
     
     });
 
@@ -53,6 +65,8 @@ async function chartIt() {
 
 
             async function getData() {
+                const xs  = [];
+                const ys =  [];
               const response = await fetch('WEATHER.csv');
               const data = await response.text();
               //console.log(data);
@@ -63,13 +77,15 @@ async function chartIt() {
               table.forEach(row => {
                   const columns  = row.split(',');
                   const  year  =  columns[0];
-                  xlabels.push(year);
+                  xs.push(year);
                   const temp = columns[1];
-                  ytemps.push(parseFloat(temp) + 14);
+                  ys.push(parseFloat(temp) + 14);
                   //console.log(row);
                   console.log(year, temp);
                   
               });
+
+              return { xs, ys };
               //console.log(rows);
             
             }
